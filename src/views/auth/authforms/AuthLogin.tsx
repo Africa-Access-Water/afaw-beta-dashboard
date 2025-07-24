@@ -8,7 +8,7 @@ const AuthLogin = () => {
   const handleSubmit = (event:React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log(event);
-     navigate("/");
+     navigate("/dashboard");
   }
   return (
     <>

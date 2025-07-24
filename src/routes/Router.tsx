@@ -27,11 +27,23 @@ const SamplePage = Loadable(lazy(() => import('../views/sample-page/SamplePage')
 const Error = Loadable(lazy(() => import('../views/auth/error/Error')));
 
 const Router = [
+   {
+    path: '/',
+    element: <BlankLayout />,
+    children: [
+      { path: '/', element: <Login /> },
+      { path: '/auth/login', element: <Login /> },
+      { path: '/auth/register', element: <Register /> },
+      { path: '404', element: <Error /> },
+      { path: '/auth/404', element: <Error /> },
+      { path: '*', element: <Navigate to="/auth/404" /> },
+    ],
+  },
   {
     path: '/',
     element: <FullLayout />,
     children: [
-      { path: '/', exact: true, element: <Dashboard /> },
+      { path: '/dashboard', exact: true, element: <Dashboard /> },
       { path: '/ui/typography', exact: true, element: <Typography /> },
       { path: '/ui/table', exact: true, element: <Table /> },
       { path: '/ui/form', exact: true, element: <Form /> },
@@ -41,17 +53,7 @@ const Router = [
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },
-  {
-    path: '/',
-    element: <BlankLayout />,
-    children: [
-      { path: '/auth/login', element: <Login /> },
-      { path: '/auth/register', element: <Register /> },
-      { path: '404', element: <Error /> },
-      { path: '/auth/404', element: <Error /> },
-      { path: '*', element: <Navigate to="/auth/404" /> },
-    ],
-  },
+ 
 ];
 
 const router = createBrowserRouter(Router, { basename: '/MatDash' });
