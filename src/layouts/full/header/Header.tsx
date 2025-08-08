@@ -58,7 +58,7 @@ const Header = () => {
 
             <div className="flex gap-4 items-center">
               <Button as={Link} to="#" size={'sm'} color={"primary"} className="rounded-md py-1 px-3">
-                Download Free
+                Manage Posts
               </Button>
               <Profile />
             </div>
