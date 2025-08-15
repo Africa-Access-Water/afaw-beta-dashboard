@@ -54,7 +54,7 @@ const SidebarContent: MenuItem[] = [
     heading: "TEAM MANAGEMENT",
     children: [
       {
-        name: "Team & Board Members",
+        name: "Team Members",
         icon: "solar:users-group-rounded-outline",
         id: uniqueId(),
         url: "/team",

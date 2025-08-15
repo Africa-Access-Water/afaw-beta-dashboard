@@ -1,57 +1,113 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import React, { useState } from "react";
-import CardBox from "../../components/shared/CardBox";
-import { Modal, Button, TextInput, Label, Select } from "flowbite-react";
-import { TbEdit, TbTrash, TbEyeOff } from "react-icons/tb";
+import React, { useState, useEffect } from 'react';
+import CardBox from '../../components/shared/CardBox';
+import { Modal, Button, TextInput, Label, Select } from 'flowbite-react';
+import { TbEdit, TbTrash, TbEyeOff } from 'react-icons/tb';
+import {
+  fetchTeamMembers,
+  createTeamMember,
+  updateTeamMember,
+  deleteTeamMember,
+} from '../../utils/api/teamService'; 
+
+type TeamMember = {
+  id: number;
+  full_name: string;
+  position: string;
+  type: string;
+  socials?: string;
+  bio?: string;
+  image_url?: string;
+};
 
 const Team = () => {
-  const [showModal, setShowModal] = useState(false);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingBtn, setLoadingBtn] = useState(false);
 
-  const teamMembers = [
-    {
-      id: 4,
-      type: "Volunteer",
-      full_name: "Aniket Chopade",
-      title: "Mr.",
-      socials: "https://www.linkedin.com/in/achopade",
-      position: "Software and Web developer",
-      image_url:
-        "https://res.cloudinary.com/dz3tgvaiw/image/upload/v1754943779/teams/1754943775461-aaaa.JPG.jpg",
-      bio: "",
-      created_at: "2025-08-11T20:23:00.303Z",
-    },
-    {
-      id: 3,
-      type: "Volunteer",
-      full_name: "Bupe Katongo",
-      title: "Mr",
-      socials: "https://web.facebook.com/profile.php?id=100092203206527",
-      position: "Web Developer",
-      image_url:
-        "https://res.cloudinary.com/dz3tgvaiw/image/upload/v1754681924/teams/1754681904439-1.png.png",
-      bio: "Grad School — Networking and Telecommunications Technology, Software engineering(Full stack developer) and Professional Graphic Design, Web Design and Freelancing Course",
-      created_at: "2025-08-08T19:38:51.436Z",
-    },
-    {
-      id: 2,
-      type: "Volunteer",
-      full_name: "Ifeoma Campos",
-      title: "Deserunt cupiditate ",
-      socials: "Quidem exercitation ",
-      position: "Reprehenderit eius c",
-      image_url:
-        "https://res.cloudinary.com/dz3tgvaiw/image/upload/v1754659420/teams/1754691744023-afaw-logo-black.png.png",
-      bio: "Enim consequuntur et",
-      created_at: "2025-08-08T13:23:41.492Z",
-    },
-  ];
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+
+  useEffect(() => {
+    loadMembers();
+  }, []);
+
+  const loadMembers = async () => {
+    try {
+      const data = await fetchTeamMembers();
+      setTeamMembers(data);
+    } catch (err) {
+      console.error('Error fetching team:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    try {
+      const newMember = await createTeamMember(formData);
+      setTeamMembers((prev) => [...prev, newMember]);
+      setShowAddModal(false);
+    } catch (err) {
+      console.error('Error adding member:', err);
+    }
+  };
+
+const handleUpdateMember = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!selectedMember) return;
+
+  const form = e.target as HTMLFormElement;
+  const formData = new FormData(form);
+
+  try {
+    setLoadingBtn(true);
+    const updated = await updateTeamMember(selectedMember.id, formData);
+    setTeamMembers((prev) => prev.map((m) => (m.id === selectedMember.id ? updated : m)));
+    setShowEditModal(false);
+  } catch (err) {
+    console.error("Error updating member:", err);
+  } finally {
+    setLoadingBtn(false); // stop loading
+  }
+};
+
+
+  const handleDeleteMember = async () => {
+    if (!selectedMember) return;
+    try {
+      await deleteTeamMember(selectedMember.id);
+      setTeamMembers((prev) => prev.filter((m) => m.id !== selectedMember.id));
+      setShowDeleteModal(false);
+    } catch (err) {
+      console.error('Error deleting member:', err);
+    }
+  };
+
+  const openEditModal = (member: TeamMember) => {
+    setSelectedMember(member);
+    setShowEditModal(true);
+  };
+
+  const openDeleteModal = (member: TeamMember) => {
+    setSelectedMember(member);
+    setShowDeleteModal(true);
+  };
+
+  if (loading) return <p>Loading team members...</p>;
 
   return (
     <CardBox>
       <div className="flex justify-between items-center mb-6">
         <h5 className="card-title">Team Members</h5>
-        <Button onClick={() => setShowModal(true)}>Add New Member</Button>
+        <Button onClick={() => setShowAddModal(true)}>Add New Member</Button>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
@@ -73,17 +129,27 @@ const Team = () => {
               </p>
             )}
             <div className="flex justify-between items-center mt-4">
-              <a
-                href={member.socials}
-                target="_blank"
-                rel="noreferrer"
-                className="text-blue-600 hover:underline text-sm"
-              >
-                View Profile
-              </a>
+              {member.socials && (
+                <a
+                  href={member.socials}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-600 hover:underline text-sm"
+                >
+                  View Profile
+                </a>
+              )}
               <div className="flex gap-2">
-                <TbEdit className="text-blue-600 cursor-pointer" size={20} />
-                <TbTrash className="text-red-600 cursor-pointer" size={20} />
+                <TbEdit
+                  className="text-blue-600 cursor-pointer"
+                  size={20}
+                  onClick={() => openEditModal(member)}
+                />
+                <TbTrash
+                  className="text-red-600 cursor-pointer"
+                  size={20}
+                  onClick={() => openDeleteModal(member)}
+                />
                 <TbEyeOff className="text-gray-600 cursor-pointer" size={20} />
               </div>
             </div>
@@ -92,97 +158,222 @@ const Team = () => {
       </div>
 
       {/* Add New Member Modal */}
-      <Modal
-        show={showModal}
-        size="4xl"
-        onClose={() => setShowModal(false)}
-        className="rounded-xl shadow-lg dark:bg-darkgray"
-      >
-        <Modal.Header className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-          Add New Team Member
-        </Modal.Header>
-
+      <Modal show={showAddModal} size="4xl" onClose={() => setShowAddModal(false)}>
+        <Modal.Header>Add New Team Member</Modal.Header>
         <Modal.Body>
-          <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-12 lg:col-span-6 flex flex-col gap-4">
-              <div>
-                <Label htmlFor="full_name" value="Full Name" className="mb-1" />
-                <TextInput
-                  id="full_name"
-                  placeholder="Enter full name"
-                  className="rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-darkgray dark:text-gray-100"
-                  required
-                />
+          <form onSubmit={handleAddMember}>
+            <div className="grid grid-cols-12 gap-6">
+              <div className="col-span-12 lg:col-span-6 flex flex-col gap-4">
+                <div>
+                  <Label htmlFor="full_name" value="Full Name" className="mb-1" />
+                  <TextInput
+                    id="full_name"
+                    placeholder="Enter full name"
+                    className="rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-darkgray dark:text-gray-100"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="position" value="Position" className="mb-1" />
+                  <TextInput
+                    id="position"
+                    placeholder="Enter position"
+                    className="rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-darkgray dark:text-gray-100"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="type" value="Type" className="mb-1" />
+                  <Select
+                    id="type"
+                    required
+                    className="rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-darkgray dark:text-gray-100"
+                  >
+                    <option>Volunteer</option>
+                    <option>Staff</option>
+                    <option>Manager</option>
+                  </Select>
+                </div>
               </div>
 
-              <div>
-                <Label htmlFor="position" value="Position" className="mb-1" />
-                <TextInput
-                  id="position"
-                  placeholder="Enter position"
-                  className="rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-darkgray dark:text-gray-100"
-                  required
-                />
+              <div className="col-span-12 lg:col-span-6 flex flex-col gap-4">
+                <div>
+                  <Label htmlFor="socials" value="Social/Profile Link" className="mb-1" />
+                  <TextInput
+                    id="socials"
+                    placeholder="https://linkedin.com/in/username"
+                    className="rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-darkgray dark:text-gray-100"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="image_file" value="Profile Image" className="mb-1" />
+                  <input
+                    type="file"
+                    id="image_file"
+                    accept="image/*"
+                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50 dark:bg-darkgray dark:text-gray-100 focus:outline-none p-2"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="bio" value="Bio" className="mb-1" />
+                  <textarea
+                    id="bio"
+                    placeholder="Enter biography"
+                    className="block w-full rounded-md border border-gray-300 text-gray-900 dark:text-gray-100 dark:bg-darkgray focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-2"
+                    rows={4}
+                  />
+                </div>
               </div>
 
-              <div>
-                <Label htmlFor="type" value="Type" className="mb-1" />
-                <Select
-                  id="type"
-                  required
-                  className="rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-darkgray dark:text-gray-100"
+              <div className="col-span-12 flex gap-3 mt-4">
+                <Button type="submit" color="primary" className="px-6 py-2 rounded-md">
+                  Add Team Member
+                </Button>
+                <Button
+                  color="failure"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-6 py-2 rounded-md"
                 >
-                  <option>Volunteer</option>
-                  <option>Staff</option>
-                  <option>Manager</option>
-                </Select>
+                  Close Form
+                </Button>
               </div>
             </div>
+          </form>
+        </Modal.Body>
+      </Modal>
 
-            <div className="col-span-12 lg:col-span-6 flex flex-col gap-4">
-              <div>
-                <Label htmlFor="socials" value="Social/Profile Link" className="mb-1" />
-                <TextInput
-                  id="socials"
-                  placeholder="https://linkedin.com/in/username"
-                  className="rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-darkgray dark:text-gray-100"
-                />
+      {/* Edit Team Member Modal */}
+      <Modal show={showEditModal} size="4xl" onClose={() => setShowEditModal(false)}>
+        <Modal.Header>Edit Team Member</Modal.Header>
+        <Modal.Body>
+          {selectedMember && (
+            <form onSubmit={handleUpdateMember}>
+              <div className="grid grid-cols-12 gap-6">
+                {/* Left Column */}
+                <div className="col-span-12 lg:col-span-6 flex flex-col gap-4">
+                  <div>
+                    <Label htmlFor="full_name" value="Full Name" />
+                    <TextInput
+                      id="full_name"
+                      placeholder="Enter full name"
+                      defaultValue={selectedMember.full_name}
+                      className="rounded-md w-full"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="position" value="Position" />
+                    <TextInput
+                      id="position"
+                      placeholder="Enter position"
+                      defaultValue={selectedMember.position}
+                      className="rounded-md w-full"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="type" value="Type" />
+                    <Select
+                      id="type"
+                      defaultValue={selectedMember.type}
+                      className="rounded-md w-full"
+                    >
+                      <option>Volunteer</option>
+                      <option>Staff</option>
+                      <option>Manager</option>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Right Column */}
+                <div className="col-span-12 lg:col-span-6 flex flex-col gap-4">
+                  <div>
+                    <Label htmlFor="socials" value="Social/Profile Link" />
+                    <TextInput
+                      id="socials"
+                      placeholder="https://linkedin.com/in/username"
+                      defaultValue={selectedMember.socials}
+                      className="rounded-md w-full"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="bio" value="Bio" />
+                    <textarea
+                      id="bio"
+                      placeholder="Enter biography"
+                      defaultValue={selectedMember.bio}
+                      className="block w-full rounded-md p-2 border border-gray-300"
+                      rows={4}
+                    />
+                  </div>
+
+                  {/* Profile Image Upload */}
+                  <div>
+                    <Label htmlFor="profile_image" value="Profile Image" />
+                    <input
+                      type="file"
+                      id="profile_image"
+                      accept="image/*"
+                      className="block w-full text-sm text-gray-500 
+              file:mr-4 file:py-2 file:px-4 
+              file:rounded-full file:border-0 
+              file:text-sm file:font-semibold 
+              file:bg-blue-50 file:text-blue-700 
+              hover:file:bg-blue-100"
+                    />
+                  </div>
+                </div>
+
+                {/* Buttons */}
+                <div className="col-span-12 flex gap-3 mt-4">
+                  <Button
+                    type="submit"
+                    color="primary"
+                    className="px-6 py-2 rounded-md flex items-center gap-2"
+                    disabled={loadingBtn} // disable during request
+                  >
+                    {loadingBtn && (
+                      <span className="animate-spin border-2 border-t-2 border-gray-200 rounded-full w-4 h-4" />
+                    )}
+                    {loadingBtn ? 'Updating...' : 'Update Member Data'}
+                  </Button>
+
+                  <Button
+                    type="submit"
+                    color="failure"
+                    onClick={() => setShowEditModal(false)}
+                    className="px-6 py-2 rounded-md"
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </div>
+            </form>
+          )}
+        </Modal.Body>
+      </Modal>
 
-              <div>
-                <Label htmlFor="image_file" value="Profile Image" className="mb-1" />
-                <input
-                  type="file"
-                  id="image_file"
-                  accept="image/*"
-                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50 dark:bg-darkgray dark:text-gray-100 focus:outline-none p-2"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="bio" value="Bio" className="mb-1" />
-                <textarea
-                  id="bio"
-                  placeholder="Enter biography"
-                  className="block w-full rounded-md border border-gray-300 text-gray-900 dark:text-gray-100 dark:bg-darkgray focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-2"
-                  rows={4}
-                />
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} size="md" onClose={() => setShowDeleteModal(false)}>
+        <Modal.Header>Confirm Delete</Modal.Header>
+        <Modal.Body>
+          {selectedMember && (
+            <div>
+              <p className="mb-4">
+                Are you sure you want to delete <strong>{selectedMember.full_name}</strong>?
+              </p>
+              <div className="flex justify-end gap-3">
+                <Button type="submit" color="failure" onClick={handleDeleteMember}>
+                  Yes, Delete
+                </Button>
+                <Button color="secondary" onClick={() => setShowDeleteModal(false)}>
+                  Cancel
+                </Button>
               </div>
             </div>
-
-            <div className="col-span-12 flex gap-3 mt-4">
-              <Button color="primary" className="px-6 py-2 rounded-md">
-                Submit
-              </Button>
-              <Button
-                color="failure"
-                onClick={() => setShowModal(false)}
-                className="px-6 py-2 rounded-md"
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
+          )}
         </Modal.Body>
       </Modal>
     </CardBox>

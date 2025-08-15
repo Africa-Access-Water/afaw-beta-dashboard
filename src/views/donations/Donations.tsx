@@ -4,38 +4,10 @@ import React from "react";
 import CardBox from "../../components/shared/CardBox";
 import { Table, Badge } from "flowbite-react";
 import SimpleBar from "simplebar-react";
+import { donations } from "../../utils/data/DonationData";
 
 const Donations = () => {
-  // Sample donations data
-  const donations = [
-    {
-      id: 1,
-      name: "John Banda",
-      email: "johnbanda@example.com",
-      amount: 250,
-      message: "Happy to support your cause!",
-      created_at: "2025-08-12T10:15:00.000Z",
-      method: "PayPal"
-    },
-    {
-      id: 2,
-      name: "Bupe Katongo",
-      email: "katongobupe444@gmail.com",
-      amount: 500,
-      message: "Keep up the great work.",
-      created_at: "2025-08-10T14:35:00.000Z",
-      method: "Bank Transfer"
-    },
-    {
-      id: 3,
-      name: "Grace Mwansa",
-      email: "gracemwansa@example.com",
-      amount: 120,
-      message: "Small contribution but from the heart.",
-      created_at: "2025-08-08T09:00:00.000Z",
-      method: "Mobile Money"
-    }
-  ];
+
 
   return (
     <CardBox>

@@ -4,38 +4,36 @@ import React, { useState } from "react";
 import CardBox from "../../components/shared/CardBox";
 import { Modal, Button, TextInput, Label, Select } from "flowbite-react";
 import { TbEdit, TbTrash, TbEyeOff } from "react-icons/tb";
+import { posts } from "../../utils/data/PostsData";
 
 const Posts = () => {
-  const [showModal, setShowModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showHideConfirm, setShowHideConfirm] = useState(false);
 
-  const posts = [
-    {
-      id: 3,
-      title: "Veniam veniam volu",
-      slug: null,
-      content: "Laboriosam deserunt",
-      type: "news",
-      image_url:
-        "https://res.cloudinary.com/dz3tgvaiw/image/upload/v1754656865/posts/1754689190631-sign.PNG.png",
-      created_at: "2025-08-08T12:41:06.303Z",
-    },
-    {
-      id: 2,
-      title: "Sed deserunt minus v",
-      slug: null,
-      content: "Sapiente id fugit v",
-      type: "news",
-      image_url:
-        "https://res.cloudinary.com/dz3tgvaiw/image/upload/v1754656666/posts/1754688990754-afaw-logo-black.png.png",
-      created_at: "2025-08-08T12:37:47.350Z",
-    },
-  ];
+  const [selectedPost, setSelectedPost] = useState<any>(null);
+
+  const handleEditClick = (post: any) => {
+    setSelectedPost(post);
+    setShowEditModal(true);
+  };
+
+  const handleDeleteClick = (post: any) => {
+    setSelectedPost(post);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleHideClick = (post: any) => {
+    setSelectedPost(post);
+    setShowHideConfirm(true);
+  };
 
   return (
     <CardBox>
       <div className="flex justify-between items-center mb-6">
         <h5 className="card-title">Manage Posts</h5>
-        <Button onClick={() => setShowModal(true)}>Create New Post</Button>
+        <Button onClick={() => setShowCreateModal(true)}>Create New Post</Button>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
@@ -56,9 +54,21 @@ const Posts = () => {
                 {new Date(post.created_at).toLocaleString()}
               </span>
               <div className="flex gap-2">
-                <TbEdit className="text-blue-600 cursor-pointer" size={20} />
-                <TbTrash className="text-red-600 cursor-pointer" size={20} />
-                <TbEyeOff className="text-gray-600 cursor-pointer" size={20} />
+                <TbEdit
+                  className="text-blue-600 cursor-pointer"
+                  size={20}
+                  onClick={() => handleEditClick(post)}
+                />
+                <TbTrash
+                  className="text-red-600 cursor-pointer"
+                  size={20}
+                  onClick={() => handleDeleteClick(post)}
+                />
+                <TbEyeOff
+                  className="text-gray-600 cursor-pointer"
+                  size={20}
+                  onClick={() => handleHideClick(post)}
+                />
               </div>
             </div>
           </div>
@@ -66,60 +76,123 @@ const Posts = () => {
       </div>
 
       {/* Create Post Modal */}
-      <Modal show={showModal} size="4xl" onClose={() => setShowModal(false)}>
+      <Modal show={showCreateModal} size="4xl" onClose={() => setShowCreateModal(false)}>
         <Modal.Header>Publish New Post</Modal.Header>
         <Modal.Body>
           <div className="grid grid-cols-12 gap-6">
             <div className="col-span-12 lg:col-span-6 flex flex-col gap-4">
-              <div>
-
-                <TextInput className="rounded-sm" id="title" placeholder="Enter title" required />
-              </div>
-
-              <div>
-                <Select id="type" required>
-                  <option>Post Type</option>
-                  <option>Article</option>
-                  <option>News</option>
-                  <option>Project</option>
-                </Select>
-              </div>
-
+              <TextInput id="title" placeholder="Enter title" required />
+              <Select id="type" required>
+                <option>Post Type</option>
+                <option>Article</option>
+                <option>News</option>
+                <option>Project</option>
+              </Select>
               <div>
                 <Label htmlFor="image_file" value="Image File" />
                 <input
                   type="file"
                   id="image_file"
                   accept="image/*"
-                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-sm cursor-pointer bg-gray-50 focus:outline-none"
+                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded cursor-pointer bg-gray-50"
                   required
                 />
               </div>
-
             </div>
             <div className="col-span-12 lg:col-span-6 flex flex-col gap-4">
-
-              <div>
-
-                <textarea
-                  id="content"
-                  placeholder="Enter post content"
-                  required
-                  className="block w-full rounded-sm border border-gray-300 text-sm text-gray-900 bg-gray-50 focus:outline-none"
-                  rows={8}
-                />
-              </div>
-
-
-
-
+              <textarea
+                id="content"
+                placeholder="Enter post content"
+                required
+                className="block w-full rounded border border-gray-300 text-sm text-gray-900 bg-gray-50"
+                rows={8}
+              />
             </div>
             <div className="col-span-12 flex gap-3">
               <Button color="primary">Publish Post</Button>
-              <Button color="failure" onClick={() => setShowModal(false)}>
-                Cancel
+              <Button color="failure" onClick={() => setShowCreateModal(false)}>
+                Close Form
               </Button>
             </div>
+          </div>
+        </Modal.Body>
+      </Modal>
+
+      {/* Edit Post Modal */}
+      <Modal show={showEditModal} size="4xl" onClose={() => setShowEditModal(false)}>
+        <Modal.Header>Update your Post</Modal.Header>
+        <Modal.Body>
+          {selectedPost && (
+            <div className="grid grid-cols-12 gap-6">
+              <div className="col-span-12 lg:col-span-6 flex flex-col gap-4">
+                <TextInput
+                  id="title"
+                  defaultValue={selectedPost.title}
+                  placeholder="Enter title"
+                  required
+                />
+                <Select id="type" defaultValue={selectedPost.type} required>
+                  <option>Article</option>
+                  <option>News</option>
+                  <option>Project</option>
+                </Select>
+                <div>
+                  <Label htmlFor="image_file" value="Replace Image" />
+                  <input
+                    type="file"
+                    id="image_file"
+                    accept="image/*"
+                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded cursor-pointer bg-gray-50"
+                  />
+                  <small className="text-gray-500">
+                    Leave blank to keep the current image.
+                  </small>
+                </div>
+              </div>
+              <div className="col-span-12 lg:col-span-6 flex flex-col gap-4">
+                <textarea
+                  id="content"
+                  defaultValue={selectedPost.content}
+                  required
+                  className="block w-full rounded border border-gray-300 text-sm text-gray-900 bg-gray-50"
+                  rows={8}
+                />
+              </div>
+              <div className="col-span-12 flex gap-3">
+                <Button color="primary">Update Post</Button>
+                <Button color="failure" onClick={() => setShowEditModal(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </Modal.Body>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteConfirm} size="md" onClose={() => setShowDeleteConfirm(false)}>
+        <Modal.Header>Confirm Delete</Modal.Header>
+        <Modal.Body>
+          <p>Are you sure you want to delete the post "{selectedPost?.title}"?</p>
+          <div className="mt-4 flex gap-3">
+            <Button color="failure">Yes, Delete</Button>
+            <Button color="gray" onClick={() => setShowDeleteConfirm(false)}>
+              Cancel
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
+
+      {/* Hide Confirmation Modal */}
+      <Modal show={showHideConfirm} size="md" onClose={() => setShowHideConfirm(false)}>
+        <Modal.Header>Confirm Hide</Modal.Header>
+        <Modal.Body>
+          <p>Do you want to hide the post "{selectedPost?.title}" from public view?</p>
+          <div className="mt-4 flex gap-3">
+            <Button color="warning">Yes, Hide</Button>
+            <Button color="gray" onClick={() => setShowHideConfirm(false)}>
+              Cancel
+            </Button>
           </div>
         </Modal.Body>
       </Modal>

@@ -1,35 +1,7 @@
-import { Link } from "react-router";
+import { DonationActivity } from '../../utils/data/DonationData'
 
 const RecentDonations = () => {
-  const DonationActivity = [
-   
-    {
-      Time: "09:58",
-      action: "K1,500.00,  Green Earth Foundation",
-      color: "bg-green-500",
-      line: "h-full w-px bg-border",
-    },
-    {
-      Time: "09:40",
-      action: "K500.00, Mary Banda",
-      color: "bg-blue-500",
-      line: "h-full w-px bg-border",
-    },
-    {
-      Time: "09:22",
-      action: "K5,000.00, Zambezi Bank",
-      color: "bg-yellow-500",
-      line: "h-full w-px bg-border",
-    },
-    {
-      Time: "09:05",
-      action: "K200.00, anonymous donor",
-      color: "bg-gray-400",
-      line: "h-full w-px bg-border",
-    },
-    
-  ];
-
+  
   return (
     <div className="rounded-xl shadow-md bg-white dark:bg-darkgray p-6 w-full">
       <h5 className="card-title mb-6 text-lg font-semibold">Recent Donations</h5>

@@ -1,6 +1,5 @@
 import { Badge } from "flowbite-react";
 import { Icon } from "@iconify/react";
-import { Link } from "react-router";
 
 // Example data (replace with API fetch)
 const posts = [

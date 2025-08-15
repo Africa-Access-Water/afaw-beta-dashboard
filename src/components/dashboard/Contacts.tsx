@@ -1,32 +1,9 @@
 import { Badge, Table } from "flowbite-react";
 import SimpleBar from "simplebar-react";
-import product1 from "/src/assets/images/products/dash-prd-1.jpg"; // Same style image
+import { contacts } from "../../utils/data/ContactsData"; 
 
 const Contacts = () => {
-  // Your contacts data
-  const contacts = [
-    {
-      id: 3,
-      name: "Aniket",
-      email: "ani.chopade57@gmail.com",
-      message: "Test email from dev",
-      created_at: "2025-08-12T01:01:33.738Z"
-    },
-    {
-      id: 2,
-      name: "Bupe Katongo",
-      email: "katongobupe444@gmail.com",
-      message: "Another Test using knex",
-      created_at: "2025-08-08T10:48:50.308Z"
-    },
-    {
-      id: 1,
-      name: "Bupe Katongo",
-      email: "katongobupe444@gmail.com",
-      message: "Testing Mail Server using PostgreSQL hosted on Render.com",
-      created_at: "2025-08-07T10:22:23.285Z"
-    }
-  ];
+
 
   return (
     <div className="rounded-xl dark:shadow-dark-md shadow-md bg-white dark:bg-darkgray pt-6 px-0 relative w-full break-words">
