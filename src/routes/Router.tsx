@@ -3,6 +3,10 @@
 import { lazy } from 'react';
 import { Navigate, createBrowserRouter } from 'react-router';
 import Loadable from 'src/layouts/full/shared/loadable/Loadable';
+import Donations from 'src/views/donations/Donations';
+import Donors from 'src/views/donors/Donors';
+import Posts from 'src/views/posts/Posts';
+import Team from 'src/views/team/Team';
 
 /* ***Layouts**** */
 const FullLayout = Loadable(lazy(() => import('../layouts/full/FullLayout')));
@@ -11,19 +15,9 @@ const BlankLayout = Loadable(lazy(() => import('../layouts/blank/BlankLayout')))
 // Dashboard
 const Dashboard = Loadable(lazy(() => import('../views/dashboards/Dashboard')));
 
-// utilities
-const Typography = Loadable(lazy(() => import('../views/typography/Typography')));
-const Table = Loadable(lazy(() => import('../views/tables/Table')));
-const Form = Loadable(lazy(() => import('../views/forms/Form')));
-const Shadow = Loadable(lazy(() => import('../views/shadows/Shadow')));
-
-// icons
-const Solar = Loadable(lazy(() => import('../views/icons/Solar')));
-
 // authentication
 const Login = Loadable(lazy(() => import('../views/auth/login/Login')));
 const Register = Loadable(lazy(() => import('../views/auth/register/Register')));
-const SamplePage = Loadable(lazy(() => import('../views/sample-page/SamplePage')));
 const Error = Loadable(lazy(() => import('../views/auth/error/Error')));
 
 const Router = [
@@ -44,12 +38,10 @@ const Router = [
     element: <FullLayout />,
     children: [
       { path: '/dashboard', exact: true, element: <Dashboard /> },
-      { path: '/ui/typography', exact: true, element: <Typography /> },
-      { path: '/ui/table', exact: true, element: <Table /> },
-      { path: '/ui/form', exact: true, element: <Form /> },
-      { path: '/ui/shadow', exact: true, element: <Shadow /> },
-      { path: '/icons/solar', exact: true, element: <Solar /> },
-      { path: '/sample-page', exact: true, element: <SamplePage /> },
+      { path: '/donations', exact: true, element: <Donations /> },
+      { path: '/donors', exact: true, element: <Donors /> },
+      { path: '/team', exact: true, element: <Team /> },
+      { path: '/posts', exact: true, element: <Posts /> },
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },
