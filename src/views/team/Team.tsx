@@ -9,7 +9,7 @@ import {
   createTeamMember,
   updateTeamMember,
   deleteTeamMember,
-} from '../../utils/api/teamService'; 
+} from '../../utils/api/teamService';
 
 type TeamMember = {
   id: number;
@@ -51,42 +51,52 @@ const Team = () => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
+
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+
     try {
+      setLoadingBtn(true);
       const newMember = await createTeamMember(formData);
       setTeamMembers((prev) => [...prev, newMember]);
       setShowAddModal(false);
     } catch (err) {
+      setLoadingBtn(false);
       console.error('Error adding member:', err);
+    } finally {
+      setLoadingBtn(false); // stop loading
     }
   };
 
-const handleUpdateMember = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!selectedMember) return;
+  const handleUpdateMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedMember) return;
 
-  const form = e.target as HTMLFormElement;
-  const formData = new FormData(form);
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
 
-  try {
-    setLoadingBtn(true);
-    const updated = await updateTeamMember(selectedMember.id, formData);
-    setTeamMembers((prev) => prev.map((m) => (m.id === selectedMember.id ? updated : m)));
-    setShowEditModal(false);
-  } catch (err) {
-    console.error("Error updating member:", err);
-  } finally {
-    setLoadingBtn(false); // stop loading
-  }
-};
-
+    try {
+      setLoadingBtn(true);
+      const updated = await updateTeamMember(selectedMember.id, formData);
+      setTeamMembers((prev) => prev.map((m) => (m.id === selectedMember.id ? updated : m)));
+      setShowEditModal(false);
+    } catch (err) {
+      console.error('Error updating member:', err);
+    } finally {
+      setLoadingBtn(false); // stop loading
+    }
+  };
 
   const handleDeleteMember = async () => {
     if (!selectedMember) return;
     try {
+      setLoadingBtn(true);
       await deleteTeamMember(selectedMember.id);
       setTeamMembers((prev) => prev.filter((m) => m.id !== selectedMember.id));
       setShowDeleteModal(false);
     } catch (err) {
+      setLoadingBtn(false);
       console.error('Error deleting member:', err);
     }
   };
@@ -168,6 +178,7 @@ const handleUpdateMember = async (e: React.FormEvent) => {
                   <Label htmlFor="full_name" value="Full Name" className="mb-1" />
                   <TextInput
                     id="full_name"
+                    name="full_name"
                     placeholder="Enter full name"
                     className="rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-darkgray dark:text-gray-100"
                     required
@@ -178,6 +189,7 @@ const handleUpdateMember = async (e: React.FormEvent) => {
                   <Label htmlFor="position" value="Position" className="mb-1" />
                   <TextInput
                     id="position"
+                    name="position"
                     placeholder="Enter position"
                     className="rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-darkgray dark:text-gray-100"
                     required
@@ -188,12 +200,13 @@ const handleUpdateMember = async (e: React.FormEvent) => {
                   <Label htmlFor="type" value="Type" className="mb-1" />
                   <Select
                     id="type"
+                    name="type"
                     required
                     className="rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-darkgray dark:text-gray-100"
                   >
                     <option>Volunteer</option>
-                    <option>Staff</option>
-                    <option>Manager</option>
+                    <option>Team Member</option>
+                    <option>Board Member</option>
                   </Select>
                 </div>
               </div>
@@ -203,6 +216,7 @@ const handleUpdateMember = async (e: React.FormEvent) => {
                   <Label htmlFor="socials" value="Social/Profile Link" className="mb-1" />
                   <TextInput
                     id="socials"
+                    name="socials"
                     placeholder="https://linkedin.com/in/username"
                     className="rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-darkgray dark:text-gray-100"
                   />
@@ -213,6 +227,7 @@ const handleUpdateMember = async (e: React.FormEvent) => {
                   <input
                     type="file"
                     id="image_file"
+                    name="image"
                     accept="image/*"
                     className="block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50 dark:bg-darkgray dark:text-gray-100 focus:outline-none p-2"
                   />
@@ -222,6 +237,7 @@ const handleUpdateMember = async (e: React.FormEvent) => {
                   <Label htmlFor="bio" value="Bio" className="mb-1" />
                   <textarea
                     id="bio"
+                    name="bio"
                     placeholder="Enter biography"
                     className="block w-full rounded-md border border-gray-300 text-gray-900 dark:text-gray-100 dark:bg-darkgray focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-2"
                     rows={4}
@@ -230,7 +246,12 @@ const handleUpdateMember = async (e: React.FormEvent) => {
               </div>
 
               <div className="col-span-12 flex gap-3 mt-4">
-                <Button type="submit" color="primary" className="px-6 py-2 rounded-md">
+                <Button
+                  isProcessing={loadingBtn}
+                  type="submit"
+                  color="primary"
+                  className="px-6 py-2 rounded-md"
+                >
                   Add Team Member
                 </Button>
                 <Button
@@ -259,6 +280,7 @@ const handleUpdateMember = async (e: React.FormEvent) => {
                     <Label htmlFor="full_name" value="Full Name" />
                     <TextInput
                       id="full_name"
+                      name='full_name'
                       placeholder="Enter full name"
                       defaultValue={selectedMember.full_name}
                       className="rounded-md w-full"
@@ -268,6 +290,7 @@ const handleUpdateMember = async (e: React.FormEvent) => {
                     <Label htmlFor="position" value="Position" />
                     <TextInput
                       id="position"
+                      name='position'
                       placeholder="Enter position"
                       defaultValue={selectedMember.position}
                       className="rounded-md w-full"
@@ -277,12 +300,13 @@ const handleUpdateMember = async (e: React.FormEvent) => {
                     <Label htmlFor="type" value="Type" />
                     <Select
                       id="type"
+                      name='type'
                       defaultValue={selectedMember.type}
                       className="rounded-md w-full"
                     >
                       <option>Volunteer</option>
-                      <option>Staff</option>
-                      <option>Manager</option>
+                      <option>Team Member</option>
+                      <option>Board Member</option>
                     </Select>
                   </div>
                 </div>
@@ -302,6 +326,7 @@ const handleUpdateMember = async (e: React.FormEvent) => {
                     <Label htmlFor="bio" value="Bio" />
                     <textarea
                       id="bio"
+                      name='bio'
                       placeholder="Enter biography"
                       defaultValue={selectedMember.bio}
                       className="block w-full rounded-md p-2 border border-gray-300"
@@ -315,6 +340,7 @@ const handleUpdateMember = async (e: React.FormEvent) => {
                     <input
                       type="file"
                       id="profile_image"
+                      name='image'
                       accept="image/*"
                       className="block w-full text-sm text-gray-500 
               file:mr-4 file:py-2 file:px-4 
@@ -328,16 +354,8 @@ const handleUpdateMember = async (e: React.FormEvent) => {
 
                 {/* Buttons */}
                 <div className="col-span-12 flex gap-3 mt-4">
-                  <Button
-                    type="submit"
-                    color="primary"
-                    className="px-6 py-2 rounded-md flex items-center gap-2"
-                    disabled={loadingBtn} // disable during request
-                  >
-                    {loadingBtn && (
-                      <span className="animate-spin border-2 border-t-2 border-gray-200 rounded-full w-4 h-4" />
-                    )}
-                    {loadingBtn ? 'Updating...' : 'Update Member Data'}
+                  <Button type="submit" color="primary" isProcessing={loadingBtn}>
+                    Update Member Info.
                   </Button>
 
                   <Button
@@ -365,7 +383,12 @@ const handleUpdateMember = async (e: React.FormEvent) => {
                 Are you sure you want to delete <strong>{selectedMember.full_name}</strong>?
               </p>
               <div className="flex justify-end gap-3">
-                <Button type="submit" color="failure" onClick={handleDeleteMember}>
+                <Button
+                  isProcessing={loadingBtn}
+                  type="submit"
+                  color="failure"
+                  onClick={handleDeleteMember}
+                >
                   Yes, Delete
                 </Button>
                 <Button color="secondary" onClick={() => setShowDeleteModal(false)}>
