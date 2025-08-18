@@ -98,6 +98,8 @@ const Team = () => {
     } catch (err) {
       setLoadingBtn(false);
       console.error('Error deleting member:', err);
+    } finally {
+      setLoadingBtn(false); // stop loading
     }
   };
 
