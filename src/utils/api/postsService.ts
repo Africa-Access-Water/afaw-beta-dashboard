@@ -18,7 +18,10 @@ export const fetchPostById = async (id: number) => {
 // CREATE a Post
 export const createPost = async (formData: FormData) => {
   const res = await axios.post(API_URL, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
+    headers: { 
+      "Content-Type": "multipart/form-data",
+      "Authorization": `Bearer ${localStorage.getItem("token")}`
+    },
   });
   return res.data;
 };
