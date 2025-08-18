@@ -1,25 +1,59 @@
 import { Button, Checkbox, Label, TextInput } from "flowbite-react";
 import { Link, useNavigate } from "react-router";
-
-
+import { useState } from "react";
 
 const AuthLogin = () => {
   const navigate = useNavigate();
-  const handleSubmit = (event:React.FormEvent<HTMLFormElement>) => {
+  const [loading, setLoading] = useState(false);
+
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(event);
-     navigate("/dashboard");
-  }
+    setLoading(true);
+
+    const form = event.currentTarget;
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+
+    try {
+      const res = await fetch("https://afaw-beta-api.onrender.com/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // Store the entire response (message, token, user)
+        localStorage.setItem("user", JSON.stringify(data));
+
+        // Redirect to dashboard
+        navigate("/dashboard");
+      } else {
+        alert(data.error || "Login failed");
+      }
+    } catch (error: any) {
+      alert("Error: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   return (
     <>
-      <form onSubmit={handleSubmit} >
+      <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <div className="mb-2 block">
-            <Label htmlFor="Username" value="Username" />
+            <Label htmlFor="email" value="Email" />
           </div>
           <TextInput
-            id="Username"
-            type="text"
+            id="email"
+            name="email"
+            type="email"
             sizing="md"
             required
             className="form-control form-rounded-xl"
@@ -30,7 +64,8 @@ const AuthLogin = () => {
             <Label htmlFor="userpwd" value="Password" />
           </div>
           <TextInput
-            id="userpwd"
+            id="password"
+            name="password"
             type="password"
             sizing="md"
             required
@@ -44,15 +79,20 @@ const AuthLogin = () => {
               htmlFor="accept"
               className="opacity-90 font-normal cursor-pointer"
             >
-              Remeber this Device
+              Remember this Device
             </Label>
           </div>
           <Link to={"/"} className="text-primary text-sm font-medium">
             Forgot Password ?
           </Link>
         </div>
-        <Button type="submit" color={"primary"}  className="w-full bg-primary text-white rounded-xl">
-          Sign in
+        <Button
+          type="submit"
+          color={"primary"}
+          className="w-full bg-primary text-white rounded-xl"
+          disabled={loading}
+        >
+          {loading ? "Signing in..." : "Sign in"}
         </Button>
       </form>
     </>

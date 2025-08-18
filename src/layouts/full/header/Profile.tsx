@@ -1,21 +1,30 @@
-
+// Profile.tsx
+import { useNavigate } from "react-router-dom";
 import { Button, Dropdown } from "flowbite-react";
-import { Icon } from "@iconify/react";
-import user1 from "/src/assets/images/profile/user-1.jpg";
-import { Link } from "react-router";
+import { logout, getCurrentUser } from "src/utils/api/authService";
 
 const Profile = () => {
+  const navigate = useNavigate();
+  const data = getCurrentUser();
+  const user = data.user || {}; // Ensure user is defined
+
+  const handleLogout = () => {
+    logout();
+    navigate("/auth/login");
+    // alert("You have been logged out successfully.");
+  };
+
   return (
     <div className="relative group/menu">
       <Dropdown
         label=""
-        className="rounded-sm w-44"
+        className="rounded-sm w-60"
         dismissOnClick={false}
         renderTrigger={() => (
           <span className="h-10 w-10 hover:text-primary hover:bg-lightprimary rounded-full flex justify-center items-center cursor-pointer group-hover/menu:bg-lightprimary group-hover/menu:text-primary">
             <img
-              src={user1}
-              alt="logo"
+              src={user.avatar_url || "/src/assets/images/profile/user-1.jpg"}
+              alt="User Avatar"
               height="35"
               width="35"
               className="rounded-full"
@@ -23,19 +32,25 @@ const Profile = () => {
           </span>
         )}
       >
+        <div className="p-3 text-dark">
+          <div className="flex flex-col items-center gap-1">
+            <img
+              src={user.avatar_url || "/src/assets/images/profile/user-1.jpg"}
+              alt="User Avatar"
+              className="h-16 w-16 rounded-full"
+            />
+            <h3 className="font-semibold text-base">{user.name || "No Name"}</h3>
+            <p className="text-sm text-gray-500">{user.email || "No Email"}</p>
+            <p className="text-sm text-gray-500">{user.role || "No Role"}</p>
+          </div>
 
-        <Dropdown.Item
-          as={Link}
-          to="#"
-          className="px-3 py-3 flex items-center bg-hover group/link w-full gap-3 text-dark"
-        >
-          <Icon icon="solar:user-circle-outline" height={20} />
-          My Account
-        </Dropdown.Item>
-        
-        
-        <div className="p-3 pt-0">
-        <Button as={Link}  size={'sm'}  to="/auth/login" className="mt-2 border border-primary text-primary bg-transparent hover:bg-lightprimary outline-none focus:outline-none">Logout</Button>
+          <Button
+            size="sm"
+            onClick={handleLogout}
+            className="mt-4 w-full border border-primary text-primary bg-transparent hover:bg-lightprimary outline-none focus:outline-none"
+          >
+            Logout
+          </Button>
         </div>
       </Dropdown>
     </div>

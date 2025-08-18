@@ -1,5 +1,4 @@
 import { Link } from 'react-router';
-import BlogCards from 'src/components/dashboard/BlogCards';
 import Contacts from 'src/components/dashboard/Contacts';
 import PostCards from 'src/components/dashboard/PostsCards';
 import RecentDonations from 'src/components/dashboard/RecentDonations';

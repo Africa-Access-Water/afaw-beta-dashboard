@@ -7,6 +7,7 @@ import Donations from 'src/views/donations/Donations';
 import Donors from 'src/views/donors/Donors';
 import Posts from 'src/views/posts/Posts';
 import Team from 'src/views/team/Team';
+import ProtectedRoute from './ProtectedRoute';
 
 /* ***Layouts**** */
 const FullLayout = Loadable(lazy(() => import('../layouts/full/FullLayout')));
@@ -21,7 +22,7 @@ const Register = Loadable(lazy(() => import('../views/auth/register/Register')))
 const Error = Loadable(lazy(() => import('../views/auth/error/Error')));
 
 const Router = [
-   {
+  {
     path: '/',
     element: <BlankLayout />,
     children: [
@@ -37,16 +38,45 @@ const Router = [
     path: '/',
     element: <FullLayout />,
     children: [
-      { path: '/dashboard', exact: true, element: <Dashboard /> },
-      { path: '/donations', exact: true, element: <Donations /> },
-      { path: '/donors', exact: true, element: <Donors /> },
-      { path: '/team', exact: true, element: <Team /> },
-      { path: '/posts', exact: true, element: <Posts /> },
+      {
+        path: '/dashboard', exact: true, element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/donations', exact: true, element: (
+          <ProtectedRoute>
+            <Donations />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/donors', exact: true, element: (
+          <ProtectedRoute>
+            <Donors />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/team', exact: true, element: (
+          <ProtectedRoute>
+            <Team />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/posts', exact: true, element: (
+          <ProtectedRoute>
+            <Posts />
+          </ProtectedRoute>
+        )
+      },
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },
- 
 ];
 
-const router = createBrowserRouter(Router, { basename: '/MatDash' });
+const router = createBrowserRouter(Router, { basename: '/' });
 export default router;

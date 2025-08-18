@@ -19,12 +19,12 @@ const Login = () => {
             <div className="mx-auto">
               <FullLogo />
             </div>
-            <p className="text-sm text-center text-dark my-3">Sign In on MatDash</p>
+            <p className="text-sm text-center text-dark my-3">Welcome to AfAW Dashboard</p>
             <AuthLogin />
-            <div className="flex gap-2 text-base text-ld font-medium mt-6 items-center justify-center">
-              <p>New to Matdash?</p>
-              <Link to="/auth/register" className="text-primary text-sm font-medium">
-                Create an account
+            <div className="flex gap-2 text-base font-small mt-6 items-center justify-center">
+              <small>New to AfAW Dashboard?</small>
+              <Link to="/auth/register" className="text-primary text-xs">
+                Request Account Creation
               </Link>
             </div>
           </div>
