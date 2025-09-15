@@ -26,7 +26,16 @@
       message: "Small contribution but from the heart.",
       created_at: "2025-08-08T09:00:00.000Z",
       method: "Mobile Money"
-    }
+    },
+    {
+      id: 4,
+      name: "John Banda",
+      email: "johnbanda@example.com",
+      amount: 100,
+      message: "So happy to donate again",
+      created_at: "2025-09-05T15:15:00.000Z",
+      method: "Debit Card"
+    },
   ];
 
   const DonationActivity = [

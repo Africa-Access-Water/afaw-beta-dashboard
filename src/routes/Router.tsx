@@ -21,6 +21,9 @@ const Login = Loadable(lazy(() => import('../views/auth/login/Login')));
 const Register = Loadable(lazy(() => import('../views/auth/register/Register')));
 const Error = Loadable(lazy(() => import('../views/auth/error/Error')));
 
+// export
+const ExportPage = Loadable(lazy(() => import('../views/export/ExportPage')));
+
 const Router = [
   {
     path: '/',
@@ -70,6 +73,13 @@ const Router = [
         path: '/posts', exact: true, element: (
           <ProtectedRoute>
             <Posts />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/export', exact: true, element: (
+          <ProtectedRoute>
+            <ExportPage />
           </ProtectedRoute>
         )
       },
