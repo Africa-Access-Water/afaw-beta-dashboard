@@ -5,13 +5,22 @@ import CardBox from "../../components/shared/CardBox";
 import { Table, Badge, Avatar } from "flowbite-react";
 import SimpleBar from "simplebar-react";
 import { donors } from "src/utils/data/DonorData";
+import CSVExportButton from "../../components/export/CSVExportButton";
 
 const Donors = () => {
 
 
   return (
     <CardBox>
-      <h5 className="card-title mb-6">Donors</h5>
+      <div className="flex justify-between items-center mb-6">
+        <h5 className="card-title">Donors</h5>
+        <CSVExportButton 
+          donations={[]}
+          donors={donors}
+          variant="donors"
+          size="sm"
+        />
+      </div>
       <SimpleBar className="max-h-[500px]">
         <div className="overflow-x-auto">
           <Table hoverable>

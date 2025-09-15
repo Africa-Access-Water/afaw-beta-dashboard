@@ -5,13 +5,22 @@ import CardBox from "../../components/shared/CardBox";
 import { Table, Badge } from "flowbite-react";
 import SimpleBar from "simplebar-react";
 import { donations } from "../../utils/data/DonationData";
+import PDFDownloadButton from "../../components/pdf/PDFDownloadButton";
+import CSVExportButton from "../../components/export/CSVExportButton";
 
 const Donations = () => {
 
 
   return (
     <CardBox>
-      <h5 className="card-title mb-6">Donations</h5>
+      <div className="flex justify-between items-center mb-6">
+        <h5 className="card-title">Donations</h5>
+        <CSVExportButton 
+          donations={donations}
+          variant="donations"
+          size="sm"
+        />
+      </div>
       <SimpleBar className="max-h-[500px]">
         <div className="overflow-x-auto">
           <Table hoverable>
@@ -22,6 +31,7 @@ const Donations = () => {
               <Table.HeadCell>Payment Method</Table.HeadCell>
               <Table.HeadCell>Message</Table.HeadCell>
               <Table.HeadCell>Date</Table.HeadCell>
+              <Table.HeadCell>Actions</Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y divide-border dark:divide-darkborder">
               {donations.map((donation) => (
@@ -47,6 +57,18 @@ const Donations = () => {
                   </Table.Cell>
                   <Table.Cell>
                     {new Date(donation.created_at).toLocaleString()}
+                  </Table.Cell>
+                  <Table.Cell>
+                    <PDFDownloadButton 
+                      donation={donation}
+                      organizationInfo={{
+                        name: "AFAW Foundation",
+                        address: "123 Charity Street, Lusaka, Zambia",
+                        email: "info@africaaccesswater.org",
+                        phone: "+260 123 456 789"
+                      }}
+                      size="xs"
+                    />
                   </Table.Cell>
                 </Table.Row>
               ))}

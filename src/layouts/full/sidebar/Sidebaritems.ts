@@ -60,6 +60,17 @@ const SidebarContent: MenuItem[] = [
         url: "/team",
       },
     ],
+  },
+  {
+    heading: "REPORTS & EXPORTS",
+    children: [
+      {
+        name: "Export & Reports",
+        icon: "solar:download-linear",
+        id: uniqueId(),
+        url: "/export",
+      },
+    ],
   }
 
 ];
