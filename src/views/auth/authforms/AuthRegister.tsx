@@ -1,14 +1,18 @@
-import { Button, Label, TextInput, Select } from "flowbite-react";
+import { Button, Label, TextInput, Select, Alert } from "flowbite-react";
 import { useNavigate } from "react-router";
 import { useState } from "react";
+
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const AuthRegister = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
+    setError(""); // Clear any previous errors
 
     const form = event.currentTarget;
     const name = (form.elements.namedItem("name") as HTMLInputElement).value;
@@ -17,7 +21,7 @@ const AuthRegister = () => {
     const password = (form.elements.namedItem("password") as HTMLInputElement).value;
 
     try {
-      const res = await fetch("https://afaw-beta-api.onrender.com/api/auth/signup", {
+      const res = await fetch(`${BASE_URL}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,13 +32,13 @@ const AuthRegister = () => {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Registration successful! Please login.");
+        alert("Registration request sent successfully! Your request is pending approval.");
         navigate("/auth/login"); // redirect to login page
       } else {
-        alert(data.error || "Registration failed");
+        setError(data.error || "Registration request failed");
       }
     } catch (error: any) {
-      alert("Error: " + error.message);
+      setError("Error: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -42,6 +46,11 @@ const AuthRegister = () => {
 
   return (
     <>
+      {error && (
+        <Alert color="failure" className="mb-4">
+          {error}
+        </Alert>
+      )}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <Label htmlFor="name" value="Name" />
@@ -76,10 +85,11 @@ const AuthRegister = () => {
             name="role"
             required
             className="form-control form-rounded-xl"
-            defaultValue="user"
+            defaultValue="contributor"
           >
-            <option value="user">User</option>
             <option value="admin">Admin</option>
+            <option value="manager">Manager</option>
+            <option value="contributor">Contributor</option>
           </Select>
         </div>
 
@@ -102,7 +112,7 @@ const AuthRegister = () => {
           className="w-full"
           disabled={loading}
         >
-          {loading ? "Signing up..." : "Sign Up"}
+          {loading ? "Sending request..." : "Request Access"}
         </Button>
       </form>
     </>

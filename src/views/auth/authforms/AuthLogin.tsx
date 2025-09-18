@@ -1,22 +1,25 @@
-import { Button, Checkbox, Label, TextInput } from "flowbite-react";
+import { Button, Checkbox, Label, TextInput, Alert } from "flowbite-react";
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const AuthLogin = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
+    setError(""); // Clear any previous errors
 
     const form = event.currentTarget;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
     const password = (form.elements.namedItem("password") as HTMLInputElement).value;
 
     try {
-      const res = await fetch("https://afaw-beta-api.onrender.com/api/auth/login", {
+      const res = await fetch(`${BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,10 +36,10 @@ const AuthLogin = () => {
         // Redirect to dashboard
         navigate("/dashboard");
       } else {
-        alert(data.error || "Login failed");
+        setError(data.error || "Login failed");
       }
     } catch (error: any) {
-      alert("Error: " + error.message);
+      setError("Error: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -45,6 +48,11 @@ const AuthLogin = () => {
 
   return (
     <>
+      {error && (
+        <Alert color="failure" className="mb-4">
+          {error}
+        </Alert>
+      )}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <div className="mb-2 block">
@@ -85,7 +93,7 @@ const AuthLogin = () => {
           <Link to={"/"} className="text-primary text-sm font-medium">
             Forgot Password ?
           </Link>
-        </div>
+        </div>  
         <Button
           type="submit"
           color={"primary"}
