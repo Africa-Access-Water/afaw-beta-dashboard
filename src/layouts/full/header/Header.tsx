@@ -4,6 +4,7 @@ import {  Button, Navbar } from "flowbite-react";
 import { Icon } from "@iconify/react";
 import Profile from "./Profile";
 import Notification from "./notification";
+import PendingRequests from "./PendingRequests";
 import { Drawer } from "flowbite-react";
 import MobileSidebar from "../sidebar/MobileSidebar";
 import { Link } from "react-router";
@@ -11,6 +12,7 @@ import { Link } from "react-router";
 
 const Header = () => {
   const [isSticky, setIsSticky] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +28,20 @@ const Header = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
+  }, []);
+
+  // Check if user is admin
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        setIsAdmin(user.user?.role === "admin");
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        setIsAdmin(false);
+      }
+    }
   }, []);
 
   // mobile-sidebar
@@ -54,6 +70,7 @@ const Header = () => {
                 <Icon icon="solar:hamburger-menu-line-duotone" height={21} />
               </span>
               <Notification />
+              {isAdmin && <PendingRequests />}
             </div>
 
             <div className="flex gap-4 items-center">
