@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'https://afaw-beta-api.onrender.com/api/auth';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = `${BASE_URL}/api/auth`;
 
 // Register a new user
 export const register = async (userData: { name: string; email: string; password: string }) => {
