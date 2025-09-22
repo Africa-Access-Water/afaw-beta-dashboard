@@ -8,6 +8,7 @@ import Donors from 'src/views/donors/Donors';
 import Posts from 'src/views/posts/Posts';
 import Team from 'src/views/team/Team';
 import ProtectedRoute from './ProtectedRoute';
+import Profile from 'src/views/profile/Profile';
 
 /* ***Layouts**** */
 const FullLayout = Loadable(lazy(() => import('../layouts/full/FullLayout')));
@@ -70,6 +71,13 @@ const Router = [
         path: '/posts', exact: true, element: (
           <ProtectedRoute>
             <Posts />
+          </ProtectedRoute>
+        )
+      },
+       {
+        path: '/profile', exact: true, element: (
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         )
       },

@@ -60,6 +60,16 @@ const SidebarContent: MenuItem[] = [
         url: "/team",
       },
     ],
+  },  {
+    heading: "PROFILE",
+    children: [
+      {
+        name: "Profile",
+        icon: "solar:users-group-rounded-outline",
+        id: uniqueId(),
+        url: "/profile",
+      },
+    ],
   }
 
 ];
