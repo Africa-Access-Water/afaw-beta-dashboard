@@ -31,6 +31,12 @@ const SidebarContent: MenuItem[] = [
         id: uniqueId(),
         url: "/dashboard",
       },
+      {
+        name: "Manage Projects",
+        icon: "solar:widget-add-line-duotone",
+        id: uniqueId(),
+        url: "/projects",
+      },
     ],
   },
   {

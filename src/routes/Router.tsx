@@ -7,6 +7,7 @@ import Donations from 'src/views/donations/Donations';
 import Donors from 'src/views/donors/Donors';
 import Posts from 'src/views/posts/Posts';
 import Team from 'src/views/team/Team';
+import Projects from 'src/views/projects/Projects';
 import ProtectedRoute from './ProtectedRoute';
 
 /* ***Layouts**** */
@@ -45,6 +46,13 @@ const Router = [
         path: '/dashboard', exact: true, element: (
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/projects', exact: true, element: (
+          <ProtectedRoute>
+            <Projects />
           </ProtectedRoute>
         )
       },
