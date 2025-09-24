@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import CardBox from '../../components/shared/CardBox';
 import { Modal, Button, TextInput, Label } from 'flowbite-react';
 import { TbEdit, TbTrash, TbEyeOff } from 'react-icons/tb';
+import { Project } from '../../types/types/types'; // ✅ adjust path
 
 import {
   fetchProjects,
@@ -11,20 +12,6 @@ import {
   updateProject,
   deleteProject,
 } from '../../utils/api/projectsService';
-
-type Project = {
-  id: number;
-  name: string;
-  description: string;
-  category?: string;
-  donation_goal?: number;
-  donation_raised?: number;
-  cover_image?: string;
-  media?: string[];
-  created_at: string;
-  updated_at: string | null;
-  is_hidden: boolean;
-};
 
 const Projects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -52,9 +39,9 @@ const Projects = () => {
     setCurrentMediaIndex((prev) => (prev === selectedProject.media.length - 1 ? 0 : prev + 1));
   };
 
-  const handleSelectMedia = (index: number) => {
-    setCurrentMediaIndex(index);
-  };
+  //   const handleSelectMedia = (index: number) => {
+  //     setCurrentMediaIndex(index);
+  //   };
 
   const [loading, setLoading] = useState(true);
   const [loadingBtn, setLoadingBtn] = useState(false);
@@ -109,7 +96,7 @@ const Projects = () => {
 
     // ✅ Include media to remove
     if (selectedProject.mediaToRemove && selectedProject.mediaToRemove.length > 0) {
-      selectedProject.mediaToRemove.forEach((url) => {
+      selectedProject.mediaToRemove.forEach((url: string) => {
         formData.append('remove_media', url);
       });
     }
