@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Table, Badge, Button, Spinner } from 'flowbite-react';
-import { IconEye } from '@tabler/icons-react';
+// import { IconEye } from '@tabler/icons-react';
 import SimpleBar from 'simplebar-react';
 import DataTableFilters, { FilterConfig } from '../shared/DataTableFilters';
 import PDFDownloadButton from '../pdf/PDFDownloadButton';
@@ -69,11 +69,10 @@ const DonationsTable: React.FC<DonationsTableProps> = ({
     },
     {
       key: 'project_name',
-      label: 'Project',
+      label: 'Projects',
       type: 'select',
       options: [
-        { value: '', label: 'All Projects' },
-        { value: 'General Fund', label: 'General Fund' },
+
         ...projects.map(project => ({
           value: project.name,
           label: project.name
@@ -95,7 +94,6 @@ const DonationsTable: React.FC<DonationsTableProps> = ({
   // Filter and search logic - now uses applied filters
   const filteredDonations = useMemo(() => {
     let filtered = donations;
-    console.log('Memo updated' );
 
     // Search filter
     if (appliedSearchValue && appliedSearchValue.trim() !== '') {
@@ -244,7 +242,7 @@ const DonationsTable: React.FC<DonationsTableProps> = ({
                     <Table.Cell>
                       <div>
                         <div className="font-medium text-gray-900 dark:text-white">
-                          {donation.donor_name+'-'+donation.id+'-'+donation.donor_id || 'Unknown'}
+                          {donation.donor_name || 'Unknown'}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
                           {donation.donor_email || 'No email'}
@@ -296,22 +294,8 @@ const DonationsTable: React.FC<DonationsTableProps> = ({
                             created_at: donation.created_at,
                             method: 'Stripe'
                           }}
-                          organizationInfo={{
-                            name: "AFAW Foundation",
-                            address: "123 Charity Street, Lusaka, Zambia",
-                            email: "info@africaaccesswater.org",
-                            phone: "+260 123 456 789"
-                          }}
                           size="xs"
                         />
-                        <Button
-                          size="xs"
-                          color="light"
-                          className="flex items-center gap-1"
-                        >
-                          <IconEye size={14} />
-                          View
-                        </Button>
                       </div>
                     </Table.Cell>
                   </Table.Row>
@@ -352,6 +336,8 @@ const DonationsTable: React.FC<DonationsTableProps> = ({
           </div>
         </div>
       )}
+
+      {/* No modal – actions are inline */}
     </div>
   );
 };
