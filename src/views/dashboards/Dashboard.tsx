@@ -8,11 +8,11 @@ const Dashboard = () => {
     <div className="section-spacing">
       <div className="grid grid-cols-12 gap-6">
 
-      <div className="lg:col-span-9 col-span-12">
+      <div className="lg:col-span-8 col-span-12">
         <Contacts />
       </div>
 
-       <div className="lg:col-span-3 col-span-12 flex">
+       <div className="lg:col-span-4 col-span-12 flex">
         <RecentDonations />
       </div>
 
