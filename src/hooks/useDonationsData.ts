@@ -37,6 +37,7 @@ export interface Donor {
   has_failed_payments?: boolean;
   has_pending_payments?: boolean;
   last_donation_date?: string;
+  primary_currency?: string | null;
 }
 
 // Caching removed (backend and frontend) to keep implementation simple
@@ -122,6 +123,10 @@ export const useDonationsData = () => {
           const lastDonation = completedDonations
             .sort((a: Donation, b: Donation) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
 
+          // Get unique currencies from completed donations
+          const uniqueCurrencies = [...new Set(completedDonations.map((d: Donation) => d.currency))];
+          const primaryCurrency = uniqueCurrencies.length === 1 ? uniqueCurrencies[0] : null;
+
           return {
             ...donor,
             total_donated: totalDonated,
@@ -131,7 +136,8 @@ export const useDonationsData = () => {
             pending_donation_count: pendingDonations.length,
             has_failed_payments: failedDonations.length > 0,
             has_pending_payments: pendingDonations.length > 0,
-            last_donation_date: lastDonation?.created_at
+            last_donation_date: lastDonation?.created_at,
+            primary_currency: primaryCurrency
           };
         })
         .filter((donor: any) => donor.donation_count > 0) // Only show donors with donation history

@@ -141,7 +141,10 @@ const DonorsCards: React.FC<DonorsCardsProps> = ({ donors, loading }) => {
                   <span className="text-label">Total Donated</span>
                 </div>
                 <span className="heading-6 text-success">
-                  {formatAmount(donor.total_donated || 0, 'USD')}
+                  {donor.primary_currency 
+                    ? formatAmount(donor.total_donated || 0, donor.primary_currency)
+                    : (donor.total_donated || 0).toFixed(2)
+                  }
                 </span>
               </div>
 
