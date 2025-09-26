@@ -31,6 +31,11 @@ export interface Donor {
   updated_at: string;
   total_donated?: number;
   donation_count?: number;
+  completed_donation_count?: number;
+  failed_donation_count?: number;
+  pending_donation_count?: number;
+  has_failed_payments?: boolean;
+  has_pending_payments?: boolean;
   last_donation_date?: string;
 }
 
@@ -106,22 +111,31 @@ export const useDonationsData = () => {
         donor_email: donorsData.find((d: Donor) => d.id === donation.donor_id)?.email || 'Unknown'
       }));
 
-      const enrichedDonors = donorsData.map((donor: any) => {
-        const donorDonations = enrichedDonations.filter((d: Donation) => d.donor_id === donor.id);
-        const totalDonated = donorDonations
-          .filter((d: Donation) => d.status === 'completed')
-          .reduce((sum: number, d: Donation) => sum + d.amount, 0);
-        const lastDonation = donorDonations
-          .filter((d: Donation) => d.status === 'completed')
-          .sort((a: Donation, b: Donation) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+      const enrichedDonors = donorsData
+        .map((donor: any) => {
+          const donorDonations = enrichedDonations.filter((d: Donation) => d.donor_id === donor.id);
+          const completedDonations = donorDonations.filter((d: Donation) => d.status === 'completed');
+          const failedDonations = donorDonations.filter((d: Donation) => d.status === 'failed');
+          const pendingDonations = donorDonations.filter((d: Donation) => ['pending', 'initiated'].includes(d.status));
+          
+          const totalDonated = completedDonations.reduce((sum: number, d: Donation) => sum + d.amount, 0);
+          const lastDonation = completedDonations
+            .sort((a: Donation, b: Donation) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
 
-        return {
-          ...donor,
-          total_donated: totalDonated,
-          donation_count: donorDonations.length,
-          last_donation_date: lastDonation?.created_at
-        };
-      });
+          return {
+            ...donor,
+            total_donated: totalDonated,
+            donation_count: donorDonations.length,
+            completed_donation_count: completedDonations.length,
+            failed_donation_count: failedDonations.length,
+            pending_donation_count: pendingDonations.length,
+            has_failed_payments: failedDonations.length > 0,
+            has_pending_payments: pendingDonations.length > 0,
+            last_donation_date: lastDonation?.created_at
+          };
+        })
+        .filter((donor: any) => donor.donation_count > 0) // Only show donors with donation history
+        .sort((a: any, b: any) => (b.total_donated || 0) - (a.total_donated || 0)); // Sort by total donated (highest first)
 
       setDonations(enrichedDonations);
       setDonors(enrichedDonors);

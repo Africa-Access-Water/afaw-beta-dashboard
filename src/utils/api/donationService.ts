@@ -28,7 +28,7 @@ export const fetchDonors = async () => {
 
 // GET donations by donor ID
 export const fetchDonationsByDonor = async (donorId: number) => {
-  const res = await axios.get(`${API_URL}/donor/${donorId}`, {
+  const res = await axios.get(`${API_URL}?donor_id=${donorId}`, {
     headers: getAuthHeader(),
   });
   return res.data;
