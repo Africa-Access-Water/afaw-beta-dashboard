@@ -20,19 +20,13 @@ const TitleIconCard: React.FC<TitleCardProps> = ({
 
 
   return (
-    <Card
-      className={`card dark:shadow-dark-md shadow-md p-0 ${className}`}
-      style={{
-        borderRadius: `12px`,
-      }}
-    >
-      <div className="flex justify-between items-center border-b border-ld px-6 py-4">
-        <h5 className="text-xl font-semibold">{title}</h5>
+    <Card className={`card-elevated p-0 ${className}`}>
+      <div className="flex justify-between items-center border-b border-border dark:border-darkborder card-spacing-sm">
+        <h5 className="heading-4">{title}</h5>
 
         <Button
-          className="flex items-center"
+          className="btn-primary flex items-center"
           size="sm"
-          color="primary"
           onClick={onDownload}
         >
           <Icon
@@ -42,7 +36,7 @@ const TitleIconCard: React.FC<TitleCardProps> = ({
           />
         </Button>
       </div>
-      <div className="pt-4 p-6">{children}</div>
+      <div className="card-spacing">{children}</div>
     </Card>
   );
 };

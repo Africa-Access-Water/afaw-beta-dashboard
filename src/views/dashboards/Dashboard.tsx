@@ -5,7 +5,8 @@ import RecentDonations from 'src/components/dashboard/RecentDonations';
 
 const Dashboard = () => {
   return (
-    <div className="grid grid-cols-12 gap-30">
+    <div className="section-spacing">
+      <div className="grid grid-cols-12 gap-6">
 
       <div className="lg:col-span-9 col-span-12">
         <Contacts />
@@ -20,27 +21,28 @@ const Dashboard = () => {
       </div>
 
 
-      <div className="flex justify-center align-middle gap-2 flex-wrap col-span-12 text-center">
-        <p className="text-base">
-          Design and Developed by{' '}
-          <Link
-            to="https://adminmart.com/"
-            target="_blank"
-            className="pl-1 text-primary underline decoration-primary"
-          >
-            adminmart.com
-          </Link>
-        </p>
-        <p className="text-base">
-          Distributed by
-          <Link
-            to="https://themewagon.com/"
-            target="_blank"
-            className="pl-1 text-primary underline decoration-primary"
-          >
-            ThemeWagon
-          </Link>
-        </p>
+        <div className="flex justify-center align-middle gap-2 flex-wrap col-span-12 text-center">
+          <p className="text-body">
+            Design and Developed by{' '}
+            <Link
+              to="https://adminmart.com/"
+              target="_blank"
+              className="pl-1 text-primary underline decoration-primary"
+            >
+              adminmart.com
+            </Link>
+          </p>
+          <p className="text-body">
+            Distributed by
+            <Link
+              to="https://themewagon.com/"
+              target="_blank"
+              className="pl-1 text-primary underline decoration-primary"
+            >
+              ThemeWagon
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

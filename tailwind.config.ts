@@ -17,6 +17,7 @@ const config: Config = {
   theme: {
     fontFamily: {
       sans: ['Manrope', 'system-ui', 'serif'], // Define a custom sans-serif font family
+      manrope: ['Manrope', 'system-ui', 'sans-serif'], // Specific Manrope font family
     },
     extend: {
       boxShadow: {

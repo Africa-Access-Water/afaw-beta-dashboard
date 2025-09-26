@@ -9,12 +9,9 @@ interface MyAppProps {
 }
 const CardBox: React.FC<MyAppProps> = ({ children, className }) => {
   return (
-    <Card className={`card p-[30px] shadow-md dark:shadow-none  ${className} `}
-      style={{
-        borderRadius: `12px`,
-      }}
-    >{children}</Card>
+    <Card className={`card-elevated card-spacing ${className}`}>
+      {children}
+    </Card>
   );
-
 };
 export default CardBox;

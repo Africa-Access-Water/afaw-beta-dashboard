@@ -32,14 +32,12 @@ const Donors = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="section-spacing">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Donors Dashboard
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <h1 className="heading-2">Donors Dashboard</h1>
+          <p className="text-body mt-1">
             Manage and track all donor activities
           </p>
         </div>
@@ -47,7 +45,7 @@ const Donors = () => {
           color="light"
           onClick={refetch}
           disabled={loading}
-          className="flex items-center gap-2"
+          className="btn-ghost flex items-center gap-2"
         >
           <IconRefresh size={16} className={loading ? 'animate-spin' : ''} />
           Refresh Data

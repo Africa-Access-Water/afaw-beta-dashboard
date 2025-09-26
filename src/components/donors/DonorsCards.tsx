@@ -77,33 +77,36 @@ const DonorsCards: React.FC<DonorsCardsProps> = ({ donors, loading }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="section-spacing">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-8">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Donors ({filteredDonors.length})
-          </h3>
+          <h1 className="heading-3">Donors</h1>
+          <p className="text-body mt-1">
+            {filteredDonors.length} {filteredDonors.length === 1 ? 'donor' : 'donors'} found
+          </p>
         </div>
       </div>
 
       {/* Search Filter */}
-      <div className="mb-6">
-        <TextInput
-          icon={IconSearch}
-          placeholder="Search donors by name or email..."
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-          className="max-w-md"
-        />
+      <div className="mb-8">
+        <div className="max-w-md">
+          <TextInput
+            icon={IconSearch}
+            placeholder="Search donors by name or email..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="input-base"
+          />
+        </div>
       </div>
 
       {/* Donors Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid-responsive">
         {filteredDonors.map((donor) => (
           <Card
             key={donor.id}
-            className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            className="card-interactive animate-fade-in"
             onClick={() => handleDonorClick(donor)}
           >
             <div className="flex items-center justify-between">
@@ -113,17 +116,17 @@ const DonorsCards: React.FC<DonorsCardsProps> = ({ donors, loading }) => {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h4 className="heading-6">
                       {donor.name}
                     </h4>
                     {donor.has_failed_payments && (
-                      <IconAlertTriangle size={16} className="text-red-500" />
+                      <IconAlertTriangle size={16} className="text-error" />
                     )}
                     {donor.has_pending_payments && (
-                      <IconClock size={16} className="text-yellow-500" />
+                      <IconClock size={16} className="text-warning" />
                     )}
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-caption">
                     {donor.email}
                   </p>
                 </div>
@@ -131,23 +134,23 @@ const DonorsCards: React.FC<DonorsCardsProps> = ({ donors, loading }) => {
               <IconEye size={20} className="text-gray-400" />
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <IconCurrencyDollar size={16} className="text-green-600" />
-                  <span className="text-sm text-gray-500">Total Donated</span>
+                  <IconCurrencyDollar size={16} className="text-success" />
+                  <span className="text-label">Total Donated</span>
                 </div>
-                <span className="font-semibold text-green-600 dark:text-green-400">
+                <span className="heading-6 text-success">
                   {formatAmount(donor.total_donated || 0, 'USD')}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <IconCalendar size={16} className="text-blue-600" />
-                  <span className="text-sm text-gray-500">Last Donation</span>
+                  <IconCalendar size={16} className="text-primary" />
+                  <span className="text-label">Last Donation</span>
                 </div>
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <span className="text-body">
                   {donor.last_donation_date 
                     ? new Date(donor.last_donation_date).toLocaleDateString()
                     : 'N/A'
@@ -156,7 +159,7 @@ const DonorsCards: React.FC<DonorsCardsProps> = ({ donors, loading }) => {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Donations</span>
+                <span className="text-label">Donations</span>
                 <div className="flex items-center space-x-1">
                   <Badge color="success" size="sm">
                     {donor.completed_donation_count || 0}
