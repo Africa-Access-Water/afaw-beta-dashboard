@@ -39,10 +39,10 @@ const PostCards = () => {
   };
 
   return (
-    <div className="grid grid-cols-12 gap-6">
+    <div className="grid-responsive">
       {posts.map((post) => (
-        <div className="lg:col-span-4 col-span-12" key={post.id}>
-          <div className="rounded-xl dark:shadow-dark-md shadow-md bg-white dark:bg-darkgray overflow-hidden">
+        <div key={post.id}>
+          <div className="card-elevated overflow-hidden animate-fade-in">
             {/* Image */}
             <div className="relative">
               <img src={post.image_url} alt={post.title} className="w-full h-48 object-cover" />
@@ -52,14 +52,14 @@ const PostCards = () => {
             </div>
 
             {/* Content */}
-            <div className="px-6 pb-4">
-              <h5 className="text-lg font-semibold mt-4 mb-2 line-clamp-2">{post.title}</h5>
-              <p className="text-sm text-gray-500 line-clamp-3">{post.content}</p>
+            <div className="card-spacing-sm">
+              <h5 className="heading-6 mt-4 mb-2 line-clamp-2">{post.title}</h5>
+              <p className="text-body line-clamp-3">{post.content}</p>
 
               {/* Footer with actions */}
               <div className="flex items-center mt-4">
-                <span className="text-xs text-gray-400">{formatDate(post.created_at)}</span>
-                <div className="flex gap-3 ms-auto text-gray-500"></div>
+                <span className="text-caption">{formatDate(post.created_at)}</span>
+                <div className="flex gap-3 ms-auto text-bodytext"></div>
               </div>
             </div>
           </div>
