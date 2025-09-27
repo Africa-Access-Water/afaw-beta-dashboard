@@ -135,18 +135,17 @@ const DonorsCards: React.FC<DonorsCardsProps> = ({ donors, loading }) => {
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <IconCurrencyDollar size={16} className="text-success" />
-                  <span className="text-label">Total Donated</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-label">Total Donated</span>
+                  </div>
+                  <span className="heading-6 text-success">
+                    {donor.primary_currency 
+                      ? formatAmount(donor.total_donated || 0, donor.primary_currency)
+                      : (donor.total_donated || 0).toFixed(2)
+                    }
+                  </span>
                 </div>
-                <span className="heading-6 text-success">
-                  {donor.primary_currency 
-                    ? formatAmount(donor.total_donated || 0, donor.primary_currency)
-                    : (donor.total_donated || 0).toFixed(2)
-                  }
-                </span>
-              </div>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -214,7 +213,10 @@ const DonorsCards: React.FC<DonorsCardsProps> = ({ donors, loading }) => {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {formatAmount(selectedDonor.total_donated || 0, 'USD')}
+                    {selectedDonor.primary_currency 
+                      ? formatAmount(selectedDonor.total_donated || 0, selectedDonor.primary_currency)
+                      : (selectedDonor.total_donated || 0).toFixed(2)
+                    }
                   </div>
                   <div className="text-sm text-gray-500">Total Donated</div>
                 </div>
