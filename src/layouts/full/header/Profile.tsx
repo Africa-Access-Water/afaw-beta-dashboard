@@ -40,9 +40,16 @@ const Profile = () => {
               className="h-16 w-16 rounded-full"
             />
             <h3 className="font-semibold text-base">{user.name || "No Name"}</h3>
-            <p className="text-sm text-gray-500">{user.email || "No Email"}</p>
+            {/* <p className="text-sm text-gray-500">{user.email || "No Email"}</p> */}
             <p className="text-sm text-gray-500">{user.role || "No Role"}</p>
           </div>
+            <Button
+            size="sm"
+            href="/profile"
+            className="mt-4 w-full border border-primary text-white bg-primary hover:bg-lightprimary hover:text-primary outline-none focus:outline-none"
+          >
+            Profile
+          </Button>
 
           <Button
             size="sm"
