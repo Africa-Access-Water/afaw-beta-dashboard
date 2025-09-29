@@ -22,7 +22,11 @@ const DonorsCards: React.FC<DonorsCardsProps> = ({ donors, loading }) => {
     // Fetch donations for this donor
     try {
       const donations = await fetchDonationsByDonor(donor.id);
-      setDonorDonations(donations);
+      // Only show completed, expired, and failed donations
+      const relevantDonations = donations.filter((donation: Donation) => 
+        ['completed', 'expired', 'failed'].includes(donation.status)
+      );
+      setDonorDonations(relevantDonations);
     } catch (error) {
       console.error('Error fetching donor donations:', error);
       setDonorDonations([]);
@@ -47,7 +51,7 @@ const DonorsCards: React.FC<DonorsCardsProps> = ({ donors, loading }) => {
       case 'completed': return 'success';
       case 'pending': return 'warning';
       case 'failed': return 'failure';
-      case 'expired': return 'failure'; // Show expired as failed color
+      case 'expired': return 'gray';
       case 'initiated': return 'info';
       default: return 'gray';
     }
@@ -122,8 +126,8 @@ const DonorsCards: React.FC<DonorsCardsProps> = ({ donors, loading }) => {
                     {donor.has_failed_payments && (
                       <IconAlertTriangle size={16} className="text-error" />
                     )}
-                    {donor.has_pending_payments && (
-                      <IconClock size={16} className="text-warning" />
+                    {donor.has_expired_payments && (
+                      <IconAlertTriangle size={16} className="text-gray-500" />
                     )}
                   </div>
                   <p className="text-caption">
@@ -171,9 +175,9 @@ const DonorsCards: React.FC<DonorsCardsProps> = ({ donors, loading }) => {
                       {donor.failed_donation_count}
                     </Badge>
                   )}
-                  {(donor.pending_donation_count || 0) > 0 && (
-                    <Badge color="warning" size="sm">
-                      {donor.pending_donation_count}
+                  {(donor.expired_donation_count || 0) > 0 && (
+                    <Badge color="gray" size="sm" className="bg-gray-500 text-white">
+                      {donor.expired_donation_count}
                     </Badge>
                   )}
                 </div>
@@ -233,10 +237,10 @@ const DonorsCards: React.FC<DonorsCardsProps> = ({ donors, loading }) => {
                   <div className="text-sm text-gray-500">Failed</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
-                    {selectedDonor.pending_donation_count || 0}
+                  <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">
+                    {selectedDonor.expired_donation_count || 0}
                   </div>
-                  <div className="text-sm text-gray-500">Pending</div>
+                  <div className="text-sm text-gray-500">Expired</div>
                 </div>
               </div>
 

@@ -20,12 +20,12 @@ const DonationsTable: React.FC<DonationsTableProps> = ({
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchValue, setSearchValue] = useState('');
-  const [filterValues, setFilterValues] = useState<Record<string, any>>({});
+  const [filterValues, setFilterValues] = useState<Record<string, any>>({ status: 'completed' });
   const [projects, setProjects] = useState<Array<{id: number, name: string}>>([]);
   
   // Separate state for applied filters (what's actually used for filtering)
   const [appliedSearchValue, setAppliedSearchValue] = useState('');
-  const [appliedFilterValues, setAppliedFilterValues] = useState<Record<string, any>>({});
+  const [appliedFilterValues, setAppliedFilterValues] = useState<Record<string, any>>({ status: 'completed' });
 
   // Fetch projects for dropdown
   useEffect(() => {
@@ -48,10 +48,8 @@ const DonationsTable: React.FC<DonationsTableProps> = ({
       type: 'select',
       options: [
         { value: 'completed', label: 'Completed' },
-        { value: 'pending', label: 'Pending' },
         { value: 'failed', label: 'Failed' },
-        { value: 'expired', label: 'Expired' },
-        { value: 'initiated', label: 'Initiated' }
+        { value: 'expired', label: 'Expired' }
       ]
     },
     {
@@ -93,7 +91,10 @@ const DonationsTable: React.FC<DonationsTableProps> = ({
 
   // Filter and search logic - now uses applied filters
   const filteredDonations = useMemo(() => {
-    let filtered = donations;
+    // Pre-filter donations to only show completed, expired, and failed statuses
+    let filtered = donations.filter(donation => 
+      ['completed', 'expired', 'failed'].includes(donation.status)
+    );
 
     // Search filter
     if (appliedSearchValue && appliedSearchValue.trim() !== '') {
@@ -158,9 +159,9 @@ const DonationsTable: React.FC<DonationsTableProps> = ({
   };
 
   const handleClearFilters = () => {
-    setFilterValues(emptyFilters);
+    setFilterValues({ status: 'completed' });
     setSearchValue('');
-    setAppliedFilterValues(emptyFilters);
+    setAppliedFilterValues({ status: 'completed' });
     setAppliedSearchValue('');
   };
 
@@ -292,6 +293,7 @@ const DonationsTable: React.FC<DonationsTableProps> = ({
                             amount: donation.amount,
                             message: `Donation for ${donation.project_name || 'General Fund'}`,
                             created_at: donation.created_at,
+                            transaction_id: donation.stripe_payment_intent,
                             method: 'Stripe'
                           }}
                           size="xs"

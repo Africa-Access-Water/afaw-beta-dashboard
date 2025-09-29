@@ -33,9 +33,9 @@ export interface Donor {
   donation_count?: number;
   completed_donation_count?: number;
   failed_donation_count?: number;
-  pending_donation_count?: number;
+  expired_donation_count?: number;
   has_failed_payments?: boolean;
-  has_pending_payments?: boolean;
+  has_expired_payments?: boolean;
   last_donation_date?: string;
   primary_currency?: string | null;
 }
@@ -114,10 +114,13 @@ export const useDonationsData = () => {
 
       const enrichedDonors = donorsData
         .map((donor: any) => {
-          const donorDonations = enrichedDonations.filter((d: Donation) => d.donor_id === donor.id);
-          const completedDonations = donorDonations.filter((d: Donation) => d.status === 'completed');
-          const failedDonations = donorDonations.filter((d: Donation) => d.status === 'failed');
-          const pendingDonations = donorDonations.filter((d: Donation) => ['pending', 'initiated'].includes(d.status));
+          // Only consider donations with completed, expired, or failed status
+          const relevantDonations = enrichedDonations.filter((d: Donation) => 
+            d.donor_id === donor.id && ['completed', 'expired', 'failed'].includes(d.status)
+          );
+          const completedDonations = relevantDonations.filter((d: Donation) => d.status === 'completed');
+          const failedDonations = relevantDonations.filter((d: Donation) => d.status === 'failed');
+          const expiredDonations = relevantDonations.filter((d: Donation) => d.status === 'expired');
           
           const totalDonated = completedDonations.reduce((sum: number, d: Donation) => sum + d.amount, 0);
           const lastDonation = completedDonations
@@ -130,17 +133,17 @@ export const useDonationsData = () => {
           return {
             ...donor,
             total_donated: totalDonated,
-            donation_count: donorDonations.length,
+            donation_count: relevantDonations.length,
             completed_donation_count: completedDonations.length,
             failed_donation_count: failedDonations.length,
-            pending_donation_count: pendingDonations.length,
+            expired_donation_count: expiredDonations.length,
             has_failed_payments: failedDonations.length > 0,
-            has_pending_payments: pendingDonations.length > 0,
+            has_expired_payments: expiredDonations.length > 0,
             last_donation_date: lastDonation?.created_at,
             primary_currency: primaryCurrency
           };
         })
-        .filter((donor: any) => donor.donation_count > 0) // Only show donors with donation history
+        .filter((donor: any) => donor.completed_donation_count > 0) // Only show donors with at least one completed payment
         .sort((a: any, b: any) => (b.total_donated || 0) - (a.total_donated || 0)); // Sort by total donated (highest first)
 
       setDonations(enrichedDonations);
