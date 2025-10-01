@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import CardBox from '../../components/shared/CardBox';
 import { Modal, Button, TextInput, Label } from 'flowbite-react';
-import { TbEdit, TbTrash, TbEyeOff } from 'react-icons/tb';
+import { TbEdit, TbTrash, TbEyeOff, TbFileText } from 'react-icons/tb';
 import { Project } from '../../types/types/types'; // ✅ adjust path
 
 import {
@@ -94,10 +94,18 @@ const Projects = () => {
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
 
-    // ✅ Include media to remove
+    // Include media marked for removal
     if (selectedProject.mediaToRemove && selectedProject.mediaToRemove.length > 0) {
       selectedProject.mediaToRemove.forEach((url: string) => {
         formData.append('remove_media', url);
+      });
+    }
+
+    // Only append **new files** from input
+    const mediaInput = form.querySelector('input[name="media"]') as HTMLInputElement;
+    if (mediaInput?.files?.length) {
+      Array.from(mediaInput.files).forEach((file) => {
+        formData.append('media', file);
       });
     }
 
@@ -106,8 +114,18 @@ const Projects = () => {
 
       const updatedProject = await updateProject(selectedProject.id, formData);
 
-      // Update local projects state
-      setProjects((prev) => prev.map((p) => (p.id === selectedProject.id ? updatedProject : p)));
+      // Update local state correctly
+      setProjects((prev) =>
+        prev.map((p) => (p.id === selectedProject.id ? updatedProject : p))
+      );
+
+      // Reset media input & mediaToRemove
+      if (mediaInput) mediaInput.value = '';
+      setSelectedProject((prev: any) => ({
+        ...prev,
+        mediaToRemove: [],
+        media: updatedProject.media, // sync with updated media from API
+      }));
 
       setShowEditModal(false);
     } catch (err) {
@@ -117,6 +135,11 @@ const Projects = () => {
       setLoadingBtn(false);
     }
   };
+
+
+
+
+
 
   const handleDeleteProject = async () => {
     if (!selectedProject) return;
@@ -214,8 +237,26 @@ const Projects = () => {
                     setShowHideConfirm(true);
                   }}
                 />
+
+                {/* Show PDF if available */}
+                {project.pdf_document && (
+                  <TbFileText
+                    className="text-green-600 cursor-pointer"
+                    size={20}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Use encodeURI to handle full URL
+                      const pdfUrl = encodeURI(project.pdf_document ?? "");
+                      window.open(pdfUrl, "_blank");
+                    }}
+                    title="View Project PDF"
+                  />
+                )}
+
+
               </div>
             </div>
+
           </div>
         ))}
       </div>
@@ -299,6 +340,21 @@ const Projects = () => {
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded cursor-pointer bg-gray-50"
                 />
               </div>
+
+              {/* PDF Document */}
+              <div>
+                <Label htmlFor="pdf_document" value="Project PDF (optional)" />
+                <input
+                  type="file"
+                  id="pdf_document"
+                  name="pdf_document"
+                  accept="application/pdf"
+                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded cursor-pointer bg-gray-50"
+                />
+                <small className="text-gray-500">Upload a PDF (e.g., project proposal or report).</small>
+              </div>
+
+
             </div>
 
             <div className="col-span-12 flex gap-3">
@@ -371,33 +427,39 @@ const Projects = () => {
                   <small className="text-gray-500">Leave blank to keep current cover image.</small>
                 </div>
 
-                {/* Existing Media Preview */}
+                {/* Existing Media */}
                 {selectedProject.media && selectedProject.media.length > 0 && (
                   <div className="mb-2">
                     <Label value="Current Media" />
                     <div className="flex flex-wrap gap-2">
-                      {selectedProject.media.map((file: string, idx: number) => (
-                        <div key={idx} className="relative">
-                          <img src={file} alt="media" className="w-20 h-20 object-cover rounded" />
-                          <button
-                            type="button"
-                            className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center"
-                            onClick={() => {
-                              // Track removed media
-                              setSelectedProject((prev: any) => {
-                                const removed = prev.mediaToRemove ?? [];
-                                return {
-                                  ...prev,
-                                  media: prev.media.filter((m: string) => m !== file),
-                                  mediaToRemove: [...removed, file],
-                                };
-                              });
-                            }}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
+                      {selectedProject.media
+                        .filter((file: string) => !(selectedProject.mediaToRemove ?? []).includes(file))
+                        .map((file: string, idx: number) => (
+                          <div key={idx} className="relative">
+                            <img
+                              src={file}
+                              alt="media"
+                              className="w-20 h-20 object-cover rounded"
+                            />
+                            <input type="hidden" name="existing_media[]" value={file} />
+                            <button
+                              type="button"
+                              className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center"
+                              onClick={() => {
+                                setSelectedProject((prev: any) => {
+                                  const removed = prev.mediaToRemove ?? [];
+                                  return {
+                                    ...prev,
+                                    media: prev.media.filter((m: string) => m !== file),
+                                    mediaToRemove: [...removed, file],
+                                  };
+                                });
+                              }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
                     </div>
                   </div>
                 )}
@@ -413,6 +475,33 @@ const Projects = () => {
                     multiple
                     className="block w-full text-sm text-gray-900 border border-gray-300 rounded cursor-pointer bg-gray-50"
                   />
+                </div>
+
+                {/* PDF Document */}
+                <div>
+                  <Label htmlFor="pdf_document" value="Replace Project PDF (optional)" />
+                  <input
+                    type="file"
+                    id="pdf_document"
+                    name="pdf_document"
+                    accept="application/pdf"
+                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded cursor-pointer bg-gray-50"
+                  />
+                  <small className="text-gray-500">Leave blank to keep current PDF.</small>
+
+                  {selectedProject.pdf_document && (
+                    <p className="mt-2 text-sm">
+                      Current PDF:{" "}
+                      <a
+                        href={selectedProject.pdf_document}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        View Document
+                      </a>
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -430,10 +519,12 @@ const Projects = () => {
         </Modal.Body>
       </Modal>
 
+
       {showViewModal && selectedProject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 sm:p-6">
-          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-5xl h-[90vh] flex flex-col sm:flex-row overflow-hidden">
-            {/* Close Button Top-Right */}
+          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-6xl h-[90vh] flex flex-col sm:flex-row overflow-y">
+
+            {/* Close Button */}
             <button
               onClick={() => setShowViewModal(false)}
               className="absolute top-4 right-4 text-white bg-red-600 hover:bg-red-700 rounded-full w-8 h-8 flex items-center justify-center z-20"
@@ -441,10 +532,10 @@ const Projects = () => {
               ×
             </button>
 
-            {/* Left Column - Text Info */}
-            <div className="w-full sm:w-1/2 p-4 sm:p-6 overflow-y-auto">
-              <h2 className="text-2xl font-bold mb-4">{selectedProject.name}</h2>
-              <p className="mb-4">{selectedProject.description}</p>
+            {/* Left Column - Project Info */}
+            <div className="w-full sm:w-1/2 p-6 overflow-y-auto flex flex-col">
+              <h2 className="text-3xl font-bold mb-4">{selectedProject.name}</h2>
+              <p className="mb-4 text-gray-700">{selectedProject.description}</p>
 
               {selectedProject.category && (
                 <p className="mb-2 text-sm text-gray-600">
@@ -456,70 +547,119 @@ const Projects = () => {
                 <p className="mb-1 text-sm font-semibold">Goal: ${selectedProject.donation_goal}</p>
               )}
               {selectedProject.donation_raised !== undefined && (
-                <p className="mb-4 text-sm text-green-600">
+                <p className="mb-4 text-sm text-green-600 font-semibold">
                   Raised: ${selectedProject.donation_raised}
                 </p>
               )}
 
-              {/* Thumbnails */}
-              <div className="flex gap-2 overflow-x-auto w-full pb-2">
+              
+            </div>
+
+            {/* Right Column - Media / PDF Viewer */}
+            <div className="w-full sm:w-1/2 p-6 flex flex-col items-center bg-gray-50 overflow-hidden">
+              {[
+                ...(selectedProject.cover_image ? [selectedProject.cover_image] : []),
+                ...(selectedProject.media || []),
+                ...(selectedProject.pdf_document ? [selectedProject.pdf_document] : []),
+              ].length > 0 && (
+                  <div className="flex flex-col items-center w-full h-full">
+                    <div className="relative w-full h-[50vh] flex items-center justify-center">
+
+                      {/* Previous Button */}
+                      <button
+                        className="absolute left-2 top-1/2 -translate-y-1/2 text-white bg-black bg-opacity-50 p-2 rounded-full z-10 hover:bg-opacity-75"
+                        onClick={handlePrevMedia}
+                      >
+                        ‹
+                      </button>
+
+                      {/* Media or PDF */}
+                      {[
+                        ...(selectedProject.cover_image ? [selectedProject.cover_image] : []),
+                        ...(selectedProject.media || []),
+                        ...(selectedProject.pdf_document ? [selectedProject.pdf_document] : []),
+                      ][currentMediaIndex].endsWith('.pdf') ? (
+                        <iframe
+                          src={encodeURI(
+                            [
+                              ...(selectedProject.cover_image ? [selectedProject.cover_image] : []),
+                              ...(selectedProject.media || []),
+                              ...(selectedProject.pdf_document ? [selectedProject.pdf_document] : []),
+                            ][currentMediaIndex]
+                          )}
+                          title="Project PDF"
+                          className="w-full h-full border rounded"
+                        />
+                      ) : (
+                        <img
+                          src={
+                            [
+                              ...(selectedProject.cover_image ? [selectedProject.cover_image] : []),
+                              ...(selectedProject.media || []),
+                              ...(selectedProject.pdf_document ? [selectedProject.pdf_document] : []),
+                            ][currentMediaIndex]
+                          }
+                          alt={`media-${currentMediaIndex}`}
+                          className="max-h-full max-w-full object-contain rounded"
+                        />
+                      )}
+
+                      {/* Next Button */}
+                      <button
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-white bg-black bg-opacity-50 p-2 rounded-full z-10 hover:bg-opacity-75"
+                        onClick={handleNextMedia}
+                      >
+                        ›
+                      </button>
+                    </div>
+
+                    {/* Open PDF in New Tab */}
+                    {selectedProject.pdf_document && currentMediaIndex === ([...(selectedProject.cover_image ? [selectedProject.cover_image] : []), ...(selectedProject.media || [])].length) && (
+                      <a
+                        href={encodeURI(selectedProject.pdf_document)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                      >
+                        Open PDF in New Tab
+                      </a>
+                    )}
+                  </div>
+                )}
+
+                {/* Media Thumbnails */}
+              <div className="flex gap-2 overflow-x-auto py-2">
                 {[
                   ...(selectedProject.cover_image ? [selectedProject.cover_image] : []),
                   ...(selectedProject.media || []),
+                  ...(selectedProject.pdf_document ? [selectedProject.pdf_document] : []),
                 ].map((url, idx) => (
-                  <img
+                  <div
                     key={idx}
-                    src={url}
-                    alt={`thumb-${idx}`}
-                    className={`w-16 h-16 object-cover rounded cursor-pointer border-2 flex-shrink-0 ${
-                      idx === currentMediaIndex ? 'border-blue-500' : 'border-transparent'
-                    }`}
+                    className={`w-16 h-16 flex items-center justify-center rounded border-2 flex-shrink-0 cursor-pointer overflow-hidden ${idx === currentMediaIndex ? 'border-blue-500' : 'border-gray-200'}`}
                     onClick={() => setCurrentMediaIndex(idx)}
-                  />
+                  >
+                    {url.endsWith('.pdf') ? (
+                      <div className="text-green-600 font-bold text-sm">PDF</div>
+                    ) : (
+                      <img
+                        src={url}
+                        alt={`thumb-${idx}`}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
 
-            {/* Right Column - Media Slider */}
-            <div className="w-full sm:w-1/2 p-4 sm:p-6 flex flex-col items-center bg-gray-50 overflow-y-auto">
-              {[
-                ...(selectedProject.cover_image ? [selectedProject.cover_image] : []),
-                ...(selectedProject.media || []),
-              ].length > 0 && (
-                <div className="flex flex-col items-center w-full">
-                  {/* Main Image */}
-                  <div className="relative w-full h-64 sm:h-80 mb-4 flex items-center justify-center flex-shrink-0">
-                    <button
-                      className="absolute left-2 text-white bg-black bg-opacity-50 p-2 rounded-full z-10"
-                      onClick={handlePrevMedia}
-                    >
-                      ‹
-                    </button>
+            
 
-                    <img
-                      src={
-                        [
-                          ...(selectedProject.cover_image ? [selectedProject.cover_image] : []),
-                          ...(selectedProject.media || []),
-                        ][currentMediaIndex]
-                      }
-                      alt={`media-${currentMediaIndex}`}
-                      className="max-h-full max-w-full object-contain rounded"
-                    />
-
-                    <button
-                      className="absolute right-2 text-white bg-black bg-opacity-50 p-2 rounded-full z-10"
-                      onClick={handleNextMedia}
-                    >
-                      ›
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       )}
+
+
 
       {/* Delete Modal */}
       <Modal show={showDeleteConfirm} size="md" onClose={() => setShowDeleteConfirm(false)}>
