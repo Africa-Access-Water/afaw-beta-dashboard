@@ -2,7 +2,8 @@ import { Button, Label, TextInput, Select, Alert } from "flowbite-react";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_BASE_URL } from '../../../config';
+const BASE_URL = API_BASE_URL;
 
 const AuthRegister = () => {
   const navigate = useNavigate();

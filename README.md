@@ -1,3 +1,28 @@
+## Environment configuration
+
+This dashboard (Vite + React + TS) uses one environment variable for API base URL:
+
+```
+VITE_API_URL
+```
+
+Examples:
+- Development: `VITE_API_URL=http://localhost:5000`
+- Production: `VITE_API_URL=https://afaw-beta-api.onrender.com`
+
+Where it's used:
+- Centralized in `src/config.ts` as `API_BASE_URL`
+- Consumed by API services in `src/utils/api/*`
+
+Files updated to use config:
+- `src/utils/api/{authService,donationService,postsService,projectService,projectsService,teamService}.ts`
+- `src/utils/api/pdfService.ts`
+- `src/views/auth/authforms/{AuthLogin,AuthRegister}.tsx`
+- `src/layouts/full/header/PendingRequests.tsx`
+
+Place variables in:
+- `.env.development` for `npm run dev`
+- `.env.production` for `npm run build`
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

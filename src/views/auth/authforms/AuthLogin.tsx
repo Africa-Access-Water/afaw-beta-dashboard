@@ -2,7 +2,8 @@ import { Button, Checkbox, Label, TextInput, Alert } from "flowbite-react";
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_BASE_URL } from '../../../config';
+const BASE_URL = API_BASE_URL;
 const AuthLogin = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
