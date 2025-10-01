@@ -67,17 +67,18 @@ const SidebarContent: MenuItem[] = [
       },
     ],
   },
-  {
-    heading: "REPORTS & EXPORTS",
-    children: [
-      {
-        name: "Export & Reports",
-        icon: "solar:download-linear",
-        id: uniqueId(),
-        url: "/export",
-      },
-    ],
-  }
+  //Work in progress
+  // {
+  //   heading: "REPORTS",
+  //   children: [
+  //     {
+  //       name: "Export & Reports",
+  //       icon: "solar:download-linear",
+  //       id: uniqueId(),
+  //       url: "/export",
+  //     },
+  //   ],
+  // }
 
 ];
 
